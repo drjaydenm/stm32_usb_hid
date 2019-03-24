@@ -6,9 +6,9 @@ int main ()
 
     SystemClockConfig();
 
-    //USBD_Init(&USBD_Device, &HID_Desc, 0);
-    //USBD_RegisterClass(&USBD_Device, &USBD_HID);
-    //USBD_Start(&USBD_Device);
+    USBD_Init(&USBD_Device, &HID_Desc, 0);
+    USBD_RegisterClass(&USBD_Device, &USBD_HID);
+    USBD_Start(&USBD_Device);
 
     SetupGPIO();
 

@@ -63,6 +63,7 @@ C_SRC    =  $(wildcard ./src/core/*.c)
 C_SRC    += $(wildcard ./src/hal/*.c)
 C_SRC    += ./src/usbd_conf.c
 C_SRC    += ./src/usbd_desc.c
+C_SRC    += ./src/usbd_hid.c
 C_SRC    += ./src/interrupts.c
 C_SRC    += ./src/main.c
 

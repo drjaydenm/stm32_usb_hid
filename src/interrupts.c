@@ -49,3 +49,13 @@ void SysTick_Handler(void)
 {
     HAL_IncTick();
 }
+
+/**
+  * @brief  This function handles USB Handler.
+  * @param  None
+  * @retval None
+  */
+void USB_IRQHandler(void)
+{
+  HAL_PCD_IRQHandler(&hpcd);
+}

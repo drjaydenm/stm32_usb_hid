@@ -60,7 +60,7 @@
 #define USBD_MAX_NUM_CONFIGURATION            1
 #define USBD_MAX_STR_DESC_SIZ                 0x100
 #define USBD_SUPPORT_USER_STRING              0 
-#define USBD_SELF_POWERED                     0
+#define USBD_SELF_POWERED                     1
 #define USBD_DEBUG_LEVEL                      0
 
 /* MSC Class Config */
@@ -84,10 +84,10 @@ void USBD_static_free(void *p);
 
  /* Memory management macros */
 #define MAX_STATIC_ALLOC_SIZE 4 /*HID Class Driver Structure size*/
-#define USBD_malloc               malloc
-#define USBD_free                 free
-#define USBD_memset               memset
-#define USBD_memcpy               memcpy
+#define USBD_malloc               (uint32_t *)USBD_static_malloc
+#define USBD_free                 USBD_static_free
+#define USBD_memset               // Not used
+#define USBD_memcpy               // Not used
     
  /* DEBUG macros */  
 
