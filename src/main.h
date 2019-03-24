@@ -11,10 +11,15 @@
     #include "stm32l0xx_hal.h"
 #endif
 
+#include "usbd_core.h"
+#include "usbd_desc.h"
+
 #include "gpio_pin.h"
 
 void SetupGPIO();
 void SystemClockConfig(void);
+
+USBD_HandleTypeDef USBD_Device;
 
 GPIOPin scanRows[] =
 {

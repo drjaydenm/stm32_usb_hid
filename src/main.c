@@ -6,12 +6,16 @@ int main ()
 
     SystemClockConfig();
 
+    //USBD_Init(&USBD_Device, &HID_Desc, 0);
+    //USBD_RegisterClass(&USBD_Device, &USBD_HID);
+    //USBD_Start(&USBD_Device);
+
     SetupGPIO();
 
     int flashDelay = 0;
     while (1)
     {
-        if (flashDelay >= 100000)
+        if (flashDelay >= 10000)
         {
             flashDelay = 0;
             HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_3);
@@ -76,27 +80,33 @@ void SystemClockConfig(void)
 {
     RCC_ClkInitTypeDef RCC_ClkInitStruct;
     RCC_OscInitTypeDef RCC_OscInitStruct;
+    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
+    RCC_CRSInitTypeDef RCC_CRSInitStruct;
 
-    // No HSE Oscillator on Nucleo, Activate PLL with HSI as source
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_NONE;
-    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-    RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
-    RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct)!= HAL_OK)
-    {
-        // Initialization Error
-        while(1);
-    }
+    // Enable HSI48 Oscillator to be used as system clock source
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48;
+    HAL_RCC_OscConfig(&RCC_OscInitStruct);
 
-    // Select PLL as system clock source and configure the HCLK, PCLK1 clocks dividers
+    // Select HSI48 as USB clock source
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USB;
+    PeriphClkInitStruct.UsbClockSelection = RCC_USBCLKSOURCE_HSI48;
+    HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
+
+    // Select HSI48 as the system clock source, and configure HCLK and PCLK1 clock dividers
     RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1);
-    RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+    RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI48;
     RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
-    {
-        // Initialization Error
-        while(1);
-    }
+    HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1);
+
+    __HAL_RCC_CRS_CLK_ENABLE();
+
+    RCC_CRSInitStruct.Prescaler = RCC_CRS_SYNC_DIV1;
+    RCC_CRSInitStruct.Source = RCC_CRS_SYNC_SOURCE_USB;
+    RCC_CRSInitStruct.ReloadValue = __HAL_RCC_CRS_RELOADVALUE_CALCULATE(48000000, 1000);
+    RCC_CRSInitStruct.ErrorLimitValue = RCC_CRS_ERRORLIMIT_DEFAULT;
+    RCC_CRSInitStruct.HSI48CalibrationValue = 0x20;
+    HAL_RCCEx_CRSConfig(&RCC_CRSInitStruct);
+
+    __HAL_RCC_PWR_CLK_ENABLE();
 }
