@@ -10,7 +10,7 @@
  * The vector table.
  */
 .type vtable, %object
-.section .vector_table,"a",%progbits
+.section .isr_vector,"a",%progbits
 vtable:
     .word  _estack
     .word  Reset_Handler
