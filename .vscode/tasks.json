@@ -18,12 +18,18 @@
         {
             "label": "Clean",
             "type": "shell",
-            "command": "make clean"
+            "command": "make clean",
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
         {
             "label": "Flash",
             "type": "shell",
-            "command": "make flash"
+            "command": "make flash",
+            "problemMatcher": [
+                "$gcc"
+            ]
         }
     ]
 }
