@@ -53,10 +53,10 @@
 #define USBD_VID                      0x0483
 #define USBD_PID                      0x5710
 #define USBD_LANGID_STRING            0x409
-#define USBD_MANUFACTURER_STRING      "STMicroelectronics"
-#define USBD_PRODUCT_FS_STRING        "HID Joystick in FS Mode"
-#define USBD_CONFIGURATION_FS_STRING  "HID Config"
-#define USBD_INTERFACE_FS_STRING      "HID Interface"
+#define USBD_MANUFACTURER_STRING      "JaydenM"
+#define USBD_PRODUCT_FS_STRING        "HID Test Device"
+#define USBD_CONFIGURATION_FS_STRING  "HID Test Config"
+#define USBD_INTERFACE_FS_STRING      "HID Test Interface"
 
 /* Private macro -------------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/

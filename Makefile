@@ -41,7 +41,7 @@ CFLAGS += -mcpu=$(MCU_SPEC)
 CFLAGS += -mthumb
 CFLAGS += -Wall
 CFLAGS += -g
-CFLAGS += -O0
+CFLAGS += -O1
 CFLAGS += -std=c99
 CFLAGS += -D$(MCU_DEF)
 CFLAGS += -DMCU_CLASS_$(MCU_CLASS)
@@ -65,6 +65,7 @@ C_SRC    += ./src/usbd_conf.c
 C_SRC    += ./src/usbd_desc.c
 C_SRC    += ./src/usbd_hid.c
 C_SRC    += ./src/interrupts.c
+C_SRC    += ./src/keyboard.c
 C_SRC    += ./src/main.c
 
 INCLUDE  =  -I./

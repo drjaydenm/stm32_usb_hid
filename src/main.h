@@ -11,25 +11,20 @@
     #include "stm32l0xx_hal.h"
 #endif
 
-#include "usbd_core.h"
-#include "usbd_desc.h"
-#include "usbd_hid.h"
-
 #include "gpio_pin.h"
+#include "keyboard.h"
 
 void SetupGPIO();
 void SystemClockConfig(void);
 
-USBD_HandleTypeDef USBD_Device;
-
-GPIOPin scanRows[] =
+GPIOPin switchPins[] =
 {
     { GPIOA, GPIO_PIN_0 },
     { GPIOA, GPIO_PIN_1 },
     { GPIOA, GPIO_PIN_3 },
     { GPIOA, GPIO_PIN_4 },
 };
-int scanRowsCount = sizeof(scanRows) / sizeof(scanRows[0]);
+int switchPinsCount = sizeof(switchPins) / sizeof(switchPins[0]);
 
 GPIOPin statusLeds[] =
 {

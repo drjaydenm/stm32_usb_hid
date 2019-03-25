@@ -1,29 +1,28 @@
 #include "main.h"
 
-int main ()
+int main()
 {
     HAL_Init();
 
     SystemClockConfig();
 
-    USBD_Init(&USBD_Device, &HID_Desc, 0);
-    USBD_RegisterClass(&USBD_Device, &USBD_HID);
-    USBD_Start(&USBD_Device);
-
+    SetupKeyboard();
     SetupGPIO();
 
     int flashDelay = 0;
     while (1)
     {
+        UpdateKeyboard();
+
         if (flashDelay >= 10000)
         {
             flashDelay = 0;
             HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_3);
         }
 
-        for (int i = 0; i < scanRowsCount; i++)
+        for (int i = 0; i < switchPinsCount; i++)
         {
-            if (!HAL_GPIO_ReadPin(scanRows[i].Port, scanRows[i].Pin))
+            if (!HAL_GPIO_ReadPin(switchPins[i].Port, switchPins[i].Pin))
             {
                 HAL_GPIO_WritePin(statusLeds[i].Port, statusLeds[i].Pin, GPIO_PIN_SET);
             }
@@ -65,14 +64,14 @@ void SetupGPIO()
     }
 
     // Configure the input keys
-    for (int i = 0; i < scanRowsCount; i++)
+    for (int i = 0; i < switchPinsCount; i++)
     {
         GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
         GPIO_InitStruct.Pull = GPIO_PULLUP;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-        GPIO_InitStruct.Pin = scanRows[i].Pin;
+        GPIO_InitStruct.Pin = switchPins[i].Pin;
 
-        HAL_GPIO_Init(scanRows[i].Port, &GPIO_InitStruct);
+        HAL_GPIO_Init(switchPins[i].Port, &GPIO_InitStruct);
     }
 }
 

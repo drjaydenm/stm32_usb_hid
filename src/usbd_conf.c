@@ -48,14 +48,10 @@
 #include "usbd_core.h"
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define CURSOR_STEP     5
-
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 PCD_HandleTypeDef hpcd;
-__IO uint32_t remotewakeupon=0;
-uint8_t HID_Buffer[4];
-extern USBD_HandleTypeDef USBD_Device;
+__IO uint32_t remotewakeupon = 0;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -203,7 +199,7 @@ void HAL_PCD_ResumeCallback(PCD_HandleTypeDef *hpcd)
     SCB->SCR &= (uint32_t)~((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));    
   }
   USBD_LL_Resume((USBD_HandleTypeDef*)hpcd->pData);
-  remotewakeupon=0;
+  remotewakeupon = 0;
 }
 
 /**
@@ -529,30 +525,6 @@ static void SystemClockConfig_STOP(void)
     // Initialization Error
     while(1);
   }
-}
-
-/**
-  * @brief  Gets Pointer Data.
-  * @param  pbuf: Pointer to report
-  * @retval None
-  */
-void GetPointerData(uint8_t *pbuf)
-{
-  static int8_t cnt = 0;
-  int8_t  x = 0, y = 0 ;
-  
-  if(cnt++ > 0)
-  {
-    x = CURSOR_STEP;
-  }
-  else
-  {
-    x = -CURSOR_STEP;
-  }
-  pbuf[0] = 0;
-  pbuf[1] = x;
-  pbuf[2] = y;
-  pbuf[3] = 0;
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
