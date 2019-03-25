@@ -23,8 +23,25 @@ void UpdateKeyboard() {
     {
         if (!HAL_GPIO_ReadPin(scanRows[i].Port, scanRows[i].Pin))
         {
-            report.Keys[currentKey] = 0x20 + (0x01 * i);
-            currentKey++;
+            // Special macro key
+            if (i == 3)
+            {
+                ResetReport(&report);
+                report.Keys[0] = KEY_0;
+                report.Keys[1] = KEY_1;
+                report.Keys[2] = KEY_2;
+                report.Keys[3] = KEY_3;
+                report.Keys[4] = KEY_4;
+                report.Keys[5] = KEY_5;
+                SendReport(&report);
+
+                return;
+            }
+            else
+            {
+                report.Keys[currentKey] = 0x04 + (0x01 * i);
+                currentKey++;
+            }
         }
 
         if (currentKey >= 6) {
@@ -60,4 +77,15 @@ void CopyReportToBuffer(const HIDKeyboardReport* report, uint8_t* buffer)
     buffer[5] = report->Keys[3];
     buffer[6] = report->Keys[4];
     buffer[7] = report->Keys[5];
+}
+
+void ResetReport(HIDKeyboardReport* report)
+{
+    report->Modifiers = 0;
+    report->Keys[0] = 0;
+    report->Keys[1] = 0;
+    report->Keys[2] = 0;
+    report->Keys[3] = 0;
+    report->Keys[4] = 0;
+    report->Keys[5] = 0;
 }

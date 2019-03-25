@@ -4,6 +4,7 @@
 #include "usbd_desc.h"
 #include "usbd_hid.h"
 #include "gpio_pin.h"
+#include "keys.h"
 
 #define REPORT_BUF_SIZE 8
 
@@ -22,5 +23,6 @@ void UpdateKeyboard();
 void SendNullReport();
 void SendReport(const HIDKeyboardReport* report);
 void CopyReportToBuffer(const HIDKeyboardReport* report, uint8_t* buffer);
+void ResetReport(HIDKeyboardReport* report);
 
 #endif
