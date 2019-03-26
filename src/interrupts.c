@@ -57,5 +57,5 @@ void SysTick_Handler(void)
   */
 void USB_IRQHandler(void)
 {
-  HAL_PCD_IRQHandler(&hpcd);
+    HAL_PCD_IRQHandler(&hpcd);
 }
