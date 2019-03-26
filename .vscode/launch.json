@@ -10,7 +10,8 @@
             "executable": "./main.elf",
             "request": "launch",
             "type": "cortex-debug",
-            "servertype": "stutil"
+            "servertype": "stutil",
+            "svdFile": "${workspaceRoot}/svd/STM32F042x.svd"
         }
     ]
 }

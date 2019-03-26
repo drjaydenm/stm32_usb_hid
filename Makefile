@@ -41,7 +41,7 @@ CFLAGS += -mcpu=$(MCU_SPEC)
 CFLAGS += -mthumb
 CFLAGS += -Wall
 CFLAGS += -g
-CFLAGS += -O1
+CFLAGS += -Os
 CFLAGS += -std=c99
 CFLAGS += -D$(MCU_DEF)
 CFLAGS += -DMCU_CLASS_$(MCU_CLASS)
