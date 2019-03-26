@@ -20,9 +20,9 @@ int main()
             HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_3);
         }
 
-        for (int i = 0; i < switchPinsCount; i++)
+        for (int i = 0; i < keyCount; i++)
         {
-            if (!HAL_GPIO_ReadPin(switchPins[i].Port, switchPins[i].Pin))
+            if (!HAL_GPIO_ReadPin(keys[i].Pin.Port, keys[i].Pin.Pin))
             {
                 HAL_GPIO_WritePin(statusLeds[i].Port, statusLeds[i].Pin, GPIO_PIN_SET);
             }
@@ -61,17 +61,6 @@ void SetupGPIO()
         GPIO_InitStruct.Pin = statusLeds[i].Pin;
 
         HAL_GPIO_Init(statusLeds[i].Port, &GPIO_InitStruct);
-    }
-
-    // Configure the input keys
-    for (int i = 0; i < switchPinsCount; i++)
-    {
-        GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-        GPIO_InitStruct.Pull = GPIO_PULLUP;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-        GPIO_InitStruct.Pin = switchPins[i].Pin;
-
-        HAL_GPIO_Init(switchPins[i].Port, &GPIO_InitStruct);
     }
 }
 

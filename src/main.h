@@ -17,15 +17,6 @@
 void SetupGPIO();
 void SystemClockConfig(void);
 
-GPIOPin switchPins[] =
-{
-    { GPIOA, GPIO_PIN_0 },
-    { GPIOA, GPIO_PIN_1 },
-    { GPIOA, GPIO_PIN_3 },
-    { GPIOA, GPIO_PIN_4 },
-};
-int switchPinsCount = sizeof(switchPins) / sizeof(switchPins[0]);
-
 GPIOPin statusLeds[] =
 {
     { GPIOF, GPIO_PIN_0 },

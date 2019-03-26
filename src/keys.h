@@ -138,4 +138,7 @@
 #define KEY_RIGHTALT   ((uint8_t)0xE6)
 #define KEY_RIGHTMETA  ((uint8_t)0xE7)
 
+#define KEY_MACRO_0  ((uint8_t)0xA0)
+#define KEY_MACRO_1  ((uint8_t)0xA1)
+
 #endif

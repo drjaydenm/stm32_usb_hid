@@ -1,55 +1,140 @@
 #include "keyboard.h"
 
-GPIOPin scanRows[] =
+KeyboardKey keys[] =
 {
-    { GPIOA, GPIO_PIN_0 },
-    { GPIOA, GPIO_PIN_1 },
-    { GPIOA, GPIO_PIN_3 },
-    { GPIOA, GPIO_PIN_4 },
+    { KEY_A, { GPIOA, GPIO_PIN_0 }, KEY_STATE_UP },
+    { KEY_B, { GPIOA, GPIO_PIN_1 }, KEY_STATE_UP },
+    { KEY_C, { GPIOA, GPIO_PIN_3 }, KEY_STATE_UP },
+    { KEY_MACRO_0, { GPIOA, GPIO_PIN_4 }, KEY_STATE_UP }
 };
-int scanRowsCount = sizeof(scanRows) / sizeof(scanRows[0]);
+const int keyCount = sizeof(keys) / sizeof(keys[0]);
+
+uint8_t anyKeyDown = 0;
+uint8_t macroKeyDown = 0;
+uint8_t macroStep = 0;
+uint32_t macroMillis = 0;
 
 void SetupKeyboard() {
+    static GPIO_InitTypeDef GPIO_InitStruct;
+
     USBD_Init(&USBD_Device, &HID_Desc, 0);
     USBD_RegisterClass(&USBD_Device, &USBD_HID);
     USBD_Start(&USBD_Device);
+    
+    // Configure the key pins for input
+    for (int i = 0; i < keyCount; i++)
+    {
+        GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+        GPIO_InitStruct.Pull = GPIO_PULLUP;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+        GPIO_InitStruct.Pin = keys[i].Pin.Pin;
+
+        HAL_GPIO_Init(keys[i].Pin.Port, &GPIO_InitStruct);
+    }
 }
 
 void UpdateKeyboard() {
-    uint8_t currentKey = 0;
-    HIDKeyboardReport report = {0};
-
-    for (int i = 0; i < scanRowsCount; i++)
+    if (!macroKeyDown)
     {
-        if (!HAL_GPIO_ReadPin(scanRows[i].Port, scanRows[i].Pin))
-        {
-            // Special macro key
-            if (i == 3)
-            {
-                ResetReport(&report);
-                report.Keys[0] = KEY_0;
-                report.Keys[1] = KEY_1;
-                report.Keys[2] = KEY_2;
-                report.Keys[3] = KEY_3;
-                report.Keys[4] = KEY_4;
-                report.Keys[5] = KEY_5;
-                SendReport(&report);
+        ScanKeys();
+    }
 
-                return;
-            }
-            else
+    if (macroKeyDown)
+    {
+        HandleMacroKey();
+    }
+    else
+    {
+        HandleStandardKeys();
+    }
+}
+
+void ScanKeys()
+{
+    uint32_t millis = HAL_GetTick();
+    macroKeyDown = 0;
+    anyKeyDown = 0;
+
+    for (int i = 0; i < keyCount; i++)
+    {
+        uint8_t pinState = HAL_GPIO_ReadPin(keys[i].Pin.Port, keys[i].Pin.Pin);
+        if (pinState != keys[i].State)
+        {
+            if (millis - keys[i].StateChangeMillis > DEBOUNCE_MILLIS)
             {
-                report.Keys[currentKey] = 0x04 + (0x01 * i);
-                currentKey++;
+                keys[i].State = pinState;
+                keys[i].StateChangeMillis = millis;
             }
         }
 
-        if (currentKey >= 6) {
+        if (keys[i].State == KEY_STATE_DOWN)
+        {
+            anyKeyDown = 1;
+        }
+
+        if ((keys[i].Key == KEY_MACRO_0 || keys[i].Key == KEY_MACRO_1) && keys[i].State == KEY_STATE_DOWN)
+        {
+            macroKeyDown = keys[i].Key;
+            macroMillis = HAL_GetTick();
+        }
+    }
+}
+
+void HandleStandardKeys()
+{
+    uint8_t currentKey = 0;
+    HIDKeyboardReport report = {0};
+
+    if (!anyKeyDown)
+    {
+        SendNullReport();
+        return;
+    }
+
+    for (int i = 0; i < keyCount; i++)
+    {
+        if (keys[i].State == KEY_STATE_DOWN)
+        {
+            report.Keys[currentKey] = keys[i].Key;
+            currentKey++;
+        }
+
+        if (currentKey >= REPORT_MAX_KEYS)
+        {
             break;
         }
     }
 
     SendReport(&report);
+}
+
+void HandleMacroKey()
+{
+    HIDKeyboardReport report = {0};
+    const uint8_t macro[] = {
+        KEY_A,
+        KEY_1,
+        KEY_B,
+        KEY_2,
+        KEY_C,
+        KEY_3,
+        KEY_ENTER
+    };
+    const uint8_t macroCount = sizeof(macro) / sizeof(macro[0]);
+
+    if (macroStep < macroCount && HAL_GetTick() - macroMillis > 30)
+    {
+        report.Keys[0] = macro[macroStep];
+        SendReport(&report);
+        macroStep++;
+        macroMillis = HAL_GetTick();
+    }
+
+    if (macroStep >= macroCount)
+    {
+        macroStep = 0;
+        macroKeyDown = 0;
+    }
 }
 
 void SendNullReport() {
