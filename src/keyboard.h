@@ -5,10 +5,12 @@
 #include "usbd_hid.h"
 #include "gpio_pin.h"
 #include "keys.h"
+#include "macros.h"
 
 #define REPORT_BUF_SIZE 8
 #define REPORT_MAX_KEYS 6
 #define DEBOUNCE_MILLIS 30
+#define MACRO_KEY_DELAY 20
 
 typedef struct
 {
@@ -41,6 +43,8 @@ const int keyCount;
 void SetupKeyboard();
 void UpdateKeyboard();
 void ScanKeys();
+void BeginMacroKey(KeyboardKey key);
+void EndMacroKey();
 void HandleStandardKeys();
 void HandleMacroKey();
 void SendNullReport();

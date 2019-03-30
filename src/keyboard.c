@@ -12,7 +12,10 @@ const int keyCount = sizeof(keys) / sizeof(keys[0]);
 uint8_t anyKeyDown = 0;
 uint8_t macroKeyDown = 0;
 uint8_t macroStep = 0;
+uint8_t macroCount = 0;
+uint8_t macroNextKeySame = 0;
 uint32_t macroMillis = 0;
+char macroContent[100] = {0};
 
 void SetupKeyboard() {
     static GPIO_InitTypeDef GPIO_InitStruct;
@@ -34,6 +37,7 @@ void SetupKeyboard() {
 }
 
 void UpdateKeyboard() {
+    // Only scan for key states if we aren'y processing a macro
     if (!macroKeyDown)
     {
         ScanKeys();
@@ -52,7 +56,6 @@ void UpdateKeyboard() {
 void ScanKeys()
 {
     uint32_t millis = HAL_GetTick();
-    macroKeyDown = 0;
     anyKeyDown = 0;
 
     for (int i = 0; i < keyCount; i++)
@@ -72,17 +75,40 @@ void ScanKeys()
             anyKeyDown = 1;
         }
 
-        if ((keys[i].Key == KEY_MACRO_0 || keys[i].Key == KEY_MACRO_1) && keys[i].State == KEY_STATE_DOWN)
+        if ((keys[i].Key == KEY_MACRO_0 || keys[i].Key == KEY_MACRO_1)
+            && keys[i].State == KEY_STATE_DOWN)
         {
-            macroKeyDown = keys[i].Key;
-            macroMillis = HAL_GetTick();
+            BeginMacroKey(keys[i]);
         }
     }
 }
 
+void BeginMacroKey(KeyboardKey key)
+{
+    macroKeyDown = key.Key;
+    macroMillis = HAL_GetTick();
+
+    // Generate the output for the macrow
+    if (key.Key == KEY_MACRO_0)
+    {
+        macroCount = GenerateGuid(macroContent);
+    }
+}
+
+void EndMacroKey()
+{
+    macroKeyDown = 0;
+    macroStep = 0;
+    macroCount = 0;
+    macroNextKeySame = 0;
+
+    // Zero out the macro content
+    memset(macroContent, 0, 100);
+}
+
 void HandleStandardKeys()
 {
-    uint8_t currentKey = 0;
+    uint8_t currentReportKey = 0;
     HIDKeyboardReport report = {0};
 
     if (!anyKeyDown)
@@ -95,11 +121,12 @@ void HandleStandardKeys()
     {
         if (keys[i].State == KEY_STATE_DOWN)
         {
-            report.Keys[currentKey] = keys[i].Key;
-            currentKey++;
+            report.Keys[currentReportKey] = keys[i].Key;
+            currentReportKey++;
         }
 
-        if (currentKey >= REPORT_MAX_KEYS)
+        // We can only send up to REPORT_MAX_KEYS keys at once
+        if (currentReportKey >= REPORT_MAX_KEYS)
         {
             break;
         }
@@ -111,29 +138,37 @@ void HandleStandardKeys()
 void HandleMacroKey()
 {
     HIDKeyboardReport report = {0};
-    const uint8_t macro[] = {
-        KEY_A,
-        KEY_1,
-        KEY_B,
-        KEY_2,
-        KEY_C,
-        KEY_3,
-        KEY_ENTER
-    };
-    const uint8_t macroCount = sizeof(macro) / sizeof(macro[0]);
+    uint32_t currentTick = HAL_GetTick();
 
-    if (macroStep < macroCount && HAL_GetTick() - macroMillis > 30)
+    if (macroNextKeySame && currentTick - macroMillis > MACRO_KEY_DELAY)
     {
-        report.Keys[0] = macro[macroStep];
+        SendNullReport();
+        macroNextKeySame = 0;
+        macroMillis = HAL_GetTick();
+        return;
+    }
+
+    if (!macroNextKeySame && macroStep < macroCount && currentTick - macroMillis > MACRO_KEY_DELAY)
+    {
+        report.Keys[0] = CharToKeyCode(macroContent[macroStep]);
         SendReport(&report);
+
         macroStep++;
         macroMillis = HAL_GetTick();
+
+        // If the next and prev characters are the same, send a null report
+        if (macroStep < macroCount && macroContent[macroStep] == macroContent[macroStep - 1])
+        {
+            macroNextKeySame = 1;
+        }
+
+        return;
     }
 
     if (macroStep >= macroCount)
     {
-        macroStep = 0;
-        macroKeyDown = 0;
+        SendNullReport();
+        EndMacroKey();
     }
 }
 

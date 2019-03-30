@@ -42,6 +42,8 @@ CFLAGS += -mthumb
 CFLAGS += -Wall
 CFLAGS += -g
 CFLAGS += -Os
+CFLAGS += -fdata-sections
+CFLAGS += -ffunction-sections
 CFLAGS += -std=c99
 CFLAGS += -D$(MCU_DEF)
 CFLAGS += -DMCU_CLASS_$(MCU_CLASS)
@@ -51,6 +53,7 @@ LSCRIPT = ./ld/$(LD_SCRIPT)
 LFLAGS += -mcpu=$(MCU_SPEC)
 LFLAGS += -mthumb
 LFLAGS += -Wall
+LFLAGS += -Wl,--gc-sections
 LFLAGS += --specs=nosys.specs
 LFLAGS += -nostdlib
 LFLAGS += -lgcc
