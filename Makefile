@@ -65,6 +65,8 @@ C_SRC    += ./src/usbd_conf.c
 C_SRC    += ./src/usbd_desc.c
 C_SRC    += ./src/usbd_hid.c
 C_SRC    += ./src/interrupts.c
+C_SRC    += ./src/keys.c
+C_SRC    += ./src/macros.c
 C_SRC    += ./src/keyboard.c
 C_SRC    += ./src/main.c
 

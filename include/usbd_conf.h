@@ -59,22 +59,22 @@
 #define USBD_MAX_NUM_INTERFACES               1
 #define USBD_MAX_NUM_CONFIGURATION            1
 #define USBD_MAX_STR_DESC_SIZ                 0x100
-#define USBD_SUPPORT_USER_STRING              0 
+#define USBD_SUPPORT_USER_STRING              1
 #define USBD_SELF_POWERED                     1
 #define USBD_DEBUG_LEVEL                      0
 
 /* MSC Class Config */
-#define MSC_MEDIA_PACKET                       8192   
+#define MSC_MEDIA_PACKET                      8192
 
 /* CDC Class Config */
-#define USBD_CDC_INTERVAL                      2000  
+#define USBD_CDC_INTERVAL                     2000
 
  /* DFU Class Config */
-#define USBD_DFU_MAX_ITF_NUM                   1
-#define USBD_DFU_XFERS_IZE                     1024
+#define USBD_DFU_MAX_ITF_NUM                  1
+#define USBD_DFU_XFER_IZE                     1024
 
  /* AUDIO Class Config */
-#define USBD_AUDIO_FREQ                       22100 
+#define USBD_AUDIO_FREQ                       22100
 
 /** @defgroup USBD_Exported_Macros
   * @{
@@ -83,7 +83,7 @@ void *USBD_static_malloc(uint32_t size);
 void USBD_static_free(void *p);
 
  /* Memory management macros */
-#define MAX_STATIC_ALLOC_SIZE 4 /*HID Class Driver Structure size*/
+#define MAX_STATIC_ALLOC_SIZE     16 /*HID Class Driver Structure size*/
 #define USBD_malloc               (uint32_t *)USBD_static_malloc
 #define USBD_free                 USBD_static_free
 #define USBD_memset               // Not used

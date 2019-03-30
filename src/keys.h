@@ -141,4 +141,6 @@
 #define KEY_MACRO_0  ((uint8_t)0xA0)
 #define KEY_MACRO_1  ((uint8_t)0xA1)
 
+uint8_t CharToKeyCode(char c);
+
 #endif
